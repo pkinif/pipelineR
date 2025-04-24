@@ -14,7 +14,7 @@ check_existing_data(con, schema = Sys.getenv("PG_SCHEMA"), new_data)
 \item{new_data}{A tibble containing the new data to check, must include \code{index_ts} and \code{date} columns.}
 }
 \value{
-A tibble containing only the new rows not already present in the database.
+A tible containing only the new rows not already present in the database.
 }
 \description{
 This function removes rows from a new dataset if they already exist in the target PostgreSQL table.

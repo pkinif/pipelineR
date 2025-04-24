@@ -7,7 +7,7 @@
 #' @param schema The schema name (e.g., \"student_paul\").
 #' @param new_data A tibble containing the new data to check, must include `index_ts` and `date` columns.
 #'
-#' @return A tibble containing only the new rows not already present in the database.
+#' @return A tible containing only the new rows not already present in the database.
 #' @export
 check_existing_data <- function(con, schema = Sys.getenv("PG_SCHEMA"), new_data) {
 
