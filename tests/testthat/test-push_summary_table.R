@@ -1,4 +1,5 @@
 test_that("push_summary_table() inserts summary logs successfully", {
+  skip_if_no_db()
   con <- connect_db()
 
   # Create a fake summary_table

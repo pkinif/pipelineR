@@ -1,4 +1,5 @@
 test_that("insert_new_data() inserts new rows successfully", {
+  skip_if_no_db()
   con <- connect_db()
 
   # Create fake dataset matching table structure
@@ -28,6 +29,7 @@ test_that("insert_new_data() inserts new rows successfully", {
 })
 
 test_that("insert_new_data() fails gracefully with invalid data", {
+  skip_if_no_db()
   con <- connect_db()
 
   # Create incomplete dataset (missing required columns)

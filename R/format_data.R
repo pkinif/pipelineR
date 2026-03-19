@@ -4,18 +4,18 @@
 #' This function reshapes a wide tibble of stock prices into a long format
 #' compatible with the `data_sp500` database table.
 #'
-#' @param data A tibble with columns like open, high, low, close, volume, close_adjusted, etc.
+#' @param ohlcv A tibble with columns like open, high, low, close, volume, close_adjusted, etc.
 #'
 #' @return A tibble in long format with columns: index_ts, date, metric, value.
 #' @export
-format_data <- function(data) {
+format_data <- function(ohlcv) {
 
-  if (is.null(data)) {
-    stop("'new_data' must be provided.")
+  if (is.null(ohlcv)) {
+    stop("'ohlcv' must be provided.")
   }
 
   # Pivot longer
-  long_data <- data |>
+  long_data <- ohlcv |>
     tidyr::pivot_longer(
       cols = c(open, high, low, close, volume, close_adjusted),
       names_to = "metric",

@@ -13,7 +13,7 @@
 #' @export
 yahoo_query_data <- function(batch_list, from, to, retry = TRUE) {
 
-  result <- tibble::tibble()
+  data <- NULL
 
   tryCatch({
     # Fetch all tickers at once

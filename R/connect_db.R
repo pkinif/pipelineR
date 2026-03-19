@@ -20,6 +20,12 @@
 #' DBI::dbDisconnect(con)
 #' }
 connect_db <- function() {
+  required <- c("PG_DB", "PG_HOST", "PG_USER", "PG_PASSWORD", "PG_SCHEMA")
+  missing <- required[!nzchar(Sys.getenv(required, ""))]
+  if (length(missing) > 0) {
+    stop("Missing required env vars: ", paste(missing, collapse = ", "))
+  }
+
   con <- DBI::dbConnect(
     RPostgres::Postgres(),
     dbname = Sys.getenv("PG_DB"),

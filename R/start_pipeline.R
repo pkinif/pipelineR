@@ -49,7 +49,6 @@ start_pipeline <- function(from = Sys.Date() - 7, to = Sys.Date(), batch_size = 
         stop("No data returned from Yahoo Finance API.")
       }
       # 5.2 Insert into PostgreSQL
-      # browser()
       n_inserted  <- new_data |>
         format_data() |>
         insert_new_data(con = con)
