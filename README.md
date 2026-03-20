@@ -122,12 +122,14 @@ Recent **knitr** needs a current **xfun**. The build step runs in a **new R proc
 2. Confirm RStudio uses the same R installation as the console: *Tools → Global Options → R*.
 3. If another library path has an old **xfun**, inspect `find.package("xfun")` and `.libPaths()`.
 
-### Check without rebuilding vignettes
+### Warnings after `--no-build-vignettes`
 
-From the R console (reliable if the IDE button keeps failing):
+If you pass **`--no-build-vignettes`** to `R CMD build` / `devtools::check`, the vignette **is not knitted**, so there is no output under **`inst/doc/`**. **R CMD check** then reports **WARNING** (e.g. “Package vignette without corresponding single PDF/HTML”). That is **expected** with that flag.
+
+For a **clean check** (no such warnings), run **`devtools::check()`** or the RStudio **Check** button **without** `--no-build-vignettes` — with **xfun ≥ 0.55**, the vignette should build normally.
+
+Optional **fast** iteration (accepts vignette-related warnings):
 
 ```r
 devtools::check(document = FALSE, vignettes = FALSE)
 ```
-
-Opening **`pipelineR.Rproj`** in RStudio configures *Package build/check* with `--no-build-vignettes` so the **Check** button skips vignette compilation (vignette sources remain in the package; they are not knitted during that build).
