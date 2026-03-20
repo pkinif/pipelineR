@@ -8,9 +8,10 @@
 #' @param schema The schema name (e.g., \"student_paul\").
 #' @param new_data A tibble containing the new data to check, must include `index_ts` and `date` columns.
 #'
-#' @return A tibble containing only the new rows not already present in the database.
+#' @return A tibble of rows from `new_data` not already present as `(index_ts, date)` in `data_sp500`.
 #' @export
 #' @keywords internal
+#' @seealso [insert_new_data()] (preferred; handles deduplication including `metric`).
 check_existing_data <- function(con, schema = Sys.getenv("PG_SCHEMA"), new_data) {
 
   .Deprecated(

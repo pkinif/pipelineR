@@ -14,9 +14,13 @@ check_existing_data(con, schema = Sys.getenv("PG_SCHEMA"), new_data)
 \item{new_data}{A tibble containing the new data to check, must include \code{index_ts} and \code{date} columns.}
 }
 \value{
-A tible containing only the new rows not already present in the database.
+A tibble of rows from \code{new_data} not already present as \verb{(index_ts, date)} in \code{data_sp500}.
 }
 \description{
-This function removes rows from a new dataset if they already exist in the target PostgreSQL table.
-It avoids inserting duplicate entries based on a unique key (symbol + date or index_ts + date).
+\strong{Deprecated.} Use \code{insert_new_data()} instead, which handles deduplication automatically.
+This function is no longer used in the pipeline.
 }
+\seealso{
+\code{\link[=insert_new_data]{insert_new_data()}} (preferred; handles deduplication including \code{metric}).
+}
+\keyword{internal}

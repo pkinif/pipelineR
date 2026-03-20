@@ -1,17 +1,22 @@
-#' Connect to the ADEM PostgreSQL Database
+#' Connect to PostgreSQL
 #'
-#' Establishes a connection to the PostgreSQL database using credentials
-#' and host information stored in environment variables. This function is used
-#' internally by other functions that need to interact with the ADEM database.
+#' Opens a connection with [RPostgres::Postgres()] using credentials from the
+#' environment. All of `PG_DB`, `PG_HOST`, `PG_USER`, `PG_PASSWORD`, and
+#' `PG_SCHEMA` must be set and non-empty; otherwise an error is raised before
+#' connecting. Port is fixed at `5432`.
 #'
-#' Environment variables expected:
-#' - PG_DB: database name
-#' - PG_HOST: database host
-#' - PG_USER: database username
-#' - PG_PASSWORD: database password
+#' @section Environment variables:
+#' \describe{
+#'   \item{PG_DB}{Database name.}
+#'   \item{PG_HOST}{Host name or IP.}
+#'   \item{PG_USER}{User name.}
+#'   \item{PG_PASSWORD}{Password.}
+#'   \item{PG_SCHEMA}{Schema used by [insert_new_data()] and [push_summary_table()].}
+#' }
 #'
-#' @return A DBI connection object (class `"PqConnection"`)
+#' @return A DBI connection object (S4 class `"PqConnection"`).
 #' @export
+#' @seealso [start_pipeline()], [fetch_symbols()], [DBI::dbDisconnect()]
 #'
 #' @examples
 #' \dontrun{

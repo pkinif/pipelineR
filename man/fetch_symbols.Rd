@@ -2,18 +2,22 @@
 % Please edit documentation in R/fetch_symbols.R
 \name{fetch_symbols}
 \alias{fetch_symbols}
-\title{Fetch S&P 500 symbols from the database}
+\title{Fetch symbols from \code{sp500.info}}
 \usage{
 fetch_symbols(con)
 }
 \arguments{
-\item{con}{A valid DBI database connection.}
+\item{con}{A DBI connection (e.g. from \code{\link[=connect_db]{connect_db()}}).}
 }
 \value{
-A tibble containing two columns: \code{symbol} and \code{index_ts}.
-If no symbols are found, a warning is issued and an empty tibble is returned.
+A \code{\link[tibble:tibble]{tibble::tibble()}} with columns \code{symbol} and \code{index_ts}. If no rows
+are returned, gives a warning and returns an empty tibble.
 }
 \description{
-This function retrieves a list of distinct symbols and their corresponding index_ts
-from the \code{sp500.info} table in the PostgreSQL database.
+Reads distinct pairs of Yahoo ticker (\code{symbol}) and index identifier
+(\code{index_ts}) from the \code{sp500.info} table. This table must exist on the same
+database you connected to with \code{\link[=connect_db]{connect_db()}}.
+}
+\seealso{
+\code{\link[=split_batch]{split_batch()}}, \code{\link[=start_pipeline]{start_pipeline()}}
 }

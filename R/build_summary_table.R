@@ -1,9 +1,12 @@
-#' Initialize an empty summary table
+#' Create an empty batch log tibble
 #'
-#' This function creates an empty tibble to collect the processing summary.
+#' Zero-row template used by [start_pipeline()] before [log_summary()] rows are
+#' accumulated and [push_summary_table()] sends them to the database.
 #'
-#' @return A tibble with the columns: batch_id, symbol, status, n_rows, message, timestamp.
+#' @return A [tibble::tibble()] with columns `batch_id`, `symbol`, `status`,
+#'   `n_rows`, `message`, `timestamp` (typed but empty).
 #' @export
+#' @seealso [log_summary()], [push_summary_table()]
 build_summary_table <- function() {
   tibble::tibble(
     batch_id = integer(),

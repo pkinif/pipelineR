@@ -2,17 +2,22 @@
 % Please edit documentation in R/format_data.R
 \name{format_data}
 \alias{format_data}
-\title{Format wide Yahoo Finance data into long format}
+\title{Pivot wide OHLCV to long format}
 \usage{
-format_data(data)
+format_data(ohlcv)
 }
 \arguments{
-\item{data}{A tibble with columns like open, high, low, close, volume, close_adjusted, etc.}
+\item{ohlcv}{Wide tibble (e.g. from \code{\link[=yahoo_query_data]{yahoo_query_data()}}) with the columns above plus \code{index_ts}, \code{date}.}
 }
 \value{
-A tibble in long format with columns: index_ts, date, metric, value.
+A \code{\link[tibble:tibble]{tibble::tibble()}} with columns \code{index_ts}, \code{date}, \code{metric}, \code{value}.
 }
 \description{
-This function reshapes a wide tibble of stock prices into a long format
-compatible with the \code{data_sp500} database table.
+Takes the wide output of \code{\link[=yahoo_query_data]{yahoo_query_data()}} and pivots \code{open}, \code{high},
+\code{low}, \code{close}, \code{volume}, and \code{close_adjusted} into two columns: \code{metric} and
+\code{value}, keeping \code{index_ts} and \code{date}. The result matches the long layout
+expected by \code{\link[=insert_new_data]{insert_new_data()}}.
+}
+\seealso{
+\code{\link[=insert_new_data]{insert_new_data()}}, \code{\link[=yahoo_query_data]{yahoo_query_data()}}
 }

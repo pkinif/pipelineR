@@ -2,24 +2,27 @@
 % Please edit documentation in R/yahoo_query_data.R
 \name{yahoo_query_data}
 \alias{yahoo_query_data}
-\title{Query Yahoo Finance for historical OHLCV stock data}
+\title{Download OHLCV from Yahoo Finance}
 \usage{
 yahoo_query_data(batch_list, from, to, retry = TRUE)
 }
 \arguments{
-\item{batch_list}{A tibble with at least a column \code{symbol}, typically output from \code{split_batch()}.}
+\item{batch_list}{Tibble with at least \code{symbol}; often from \code{\link[=split_batch]{split_batch()}}.}
 
-\item{from}{A Date indicating the start date for historical data.}
+\item{from, to}{Date bounds (inclusive) for history.}
 
-\item{to}{A Date indicating the end date for historical data.}
-
-\item{retry}{Logical. If TRUE, allows retrying once in case of failure. If FALSE, stops immediately after the first error. Default is TRUE.}
+\item{retry}{If \code{TRUE}, one recursive retry after a random delay; if \code{FALSE}, propagate failure.}
 }
 \value{
-A tibble containing the fetched OHLCV data with columns: symbol, date, open, high, low, close, volume, adjusted, index_ts, source.
+A tibble with columns including \code{symbol}, \code{date}, \code{open}, \code{high},
+\code{low}, \code{close}, \code{volume}, \code{close_adjusted} (from adjusted), \code{index_ts},
+\code{source}, or \code{NULL} if no rows were returned.
 }
 \description{
-This function fetches full OHLCV (Open, High, Low, Close, Volume) data from Yahoo Finance
-for a given batch of tickers using tidyquant::tq_get. It automatically handles optional retrying
-in case of API errors for better stability.
+Calls \code{\link[tidyquant:tq_get]{tidyquant::tq_get()}} with \code{get = "stock.prices"} for all symbols in
+\code{batch_list$symbol}. On error, optionally sleeps and retries once (\code{retry = TRUE}), then stops. Adjusted close is renamed to \code{close_adjusted}; optional
+column \code{index_ts} in \code{batch_list} is aligned to each row by \code{symbol}.
+}
+\seealso{
+\code{\link[=format_data]{format_data()}}, \code{\link[=start_pipeline]{start_pipeline()}}
 }

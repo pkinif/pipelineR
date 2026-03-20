@@ -7,5 +7,6 @@
 .Rprofile
 ^LICENSE\.md$
 ^dev$
+^\.vscode$
 ^\.Rprofile$
 ^/renv$

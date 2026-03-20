@@ -2,13 +2,18 @@
 % Please edit documentation in R/build_summary_table.R
 \name{build_summary_table}
 \alias{build_summary_table}
-\title{Initialize an empty summary table}
+\title{Create an empty batch log tibble}
 \usage{
 build_summary_table()
 }
 \value{
-A tibble with the columns: batch_id, symbol, status, n_rows, message, timestamp.
+A \code{\link[tibble:tibble]{tibble::tibble()}} with columns \code{batch_id}, \code{symbol}, \code{status},
+\code{n_rows}, \code{message}, \code{timestamp} (typed but empty).
 }
 \description{
-This function creates an empty tibble to collect the processing summary.
+Zero-row template used by \code{\link[=start_pipeline]{start_pipeline()}} before \code{\link[=log_summary]{log_summary()}} rows are
+accumulated and \code{\link[=push_summary_table]{push_summary_table()}} sends them to the database.
+}
+\seealso{
+\code{\link[=log_summary]{log_summary()}}, \code{\link[=push_summary_table]{push_summary_table()}}
 }

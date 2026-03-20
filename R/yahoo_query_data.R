@@ -1,16 +1,19 @@
-#' Query Yahoo Finance for historical OHLCV stock data
+#' Download OHLCV from Yahoo Finance
 #'
-#' This function fetches full OHLCV (Open, High, Low, Close, Volume) data from Yahoo Finance
-#' for a given batch of tickers using tidyquant::tq_get. It automatically handles optional retrying
-#' in case of API errors for better stability.
+#' Calls [tidyquant::tq_get()] with `get = "stock.prices"` for all symbols in
+#' `batch_list$symbol`. On error, optionally sleeps and retries once (`retry =
+#' TRUE`), then stops. Adjusted close is renamed to `close_adjusted`; optional
+#' column `index_ts` in `batch_list` is aligned to each row by `symbol`.
 #'
-#' @param batch_list A tibble with at least a column `symbol`, typically output from `split_batch()`.
-#' @param from A Date indicating the start date for historical data.
-#' @param to A Date indicating the end date for historical data.
-#' @param retry Logical. If TRUE, allows retrying once in case of failure. If FALSE, stops immediately after the first error. Default is TRUE.
+#' @param batch_list Tibble with at least `symbol`; often from [split_batch()].
+#' @param from,to Date bounds (inclusive) for history.
+#' @param retry If `TRUE`, one recursive retry after a random delay; if `FALSE`, propagate failure.
 #'
-#' @return A tibble containing the fetched OHLCV data with columns: symbol, date, open, high, low, close, volume, adjusted, index_ts, source.
+#' @return A tibble with columns including `symbol`, `date`, `open`, `high`,
+#'   `low`, `close`, `volume`, `close_adjusted` (from adjusted), `index_ts`,
+#'   `source`, or `NULL` if no rows were returned.
 #' @export
+#' @seealso [format_data()], [start_pipeline()]
 yahoo_query_data <- function(batch_list, from, to, retry = TRUE) {
 
   data <- NULL

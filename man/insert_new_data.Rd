@@ -2,19 +2,23 @@
 % Please edit documentation in R/insert_new_data.R
 \name{insert_new_data}
 \alias{insert_new_data}
-\title{Insert new stock data into the database}
+\title{Insert long-format prices into \code{data_sp500}}
 \usage{
 insert_new_data(con, new_data)
 }
 \arguments{
-\item{con}{A valid DBI database connection.}
+\item{con}{DBI connection.}
 
-\item{new_data}{A tibble matching the table structure.}
+\item{new_data}{Tibble with columns \code{index_ts}, \code{date}, \code{metric}, \code{value} (as from \code{\link[=format_data]{format_data()}}).}
 }
 \value{
-The number of rows actually inserted.
+Integer number of rows inserted (\code{0} if everything was already present).
 }
 \description{
-This function inserts new stock data into the student's data_sp500 table inside their schema.
-It automatically removes duplicates (already existing date/index_ts/metric) before inserting.
+Writes to \verb{\{PG_SCHEMA\}.data_sp500} via \code{\link[DBI:dbWriteTable]{DBI::dbWriteTable()}} with \code{append = TRUE}. First loads existing \verb{(date, index_ts, metric)} keys for the dates and
+index codes present in \code{new_data}, then \code{\link[dplyr:filter-joins]{dplyr::anti_join()}}s so only new
+triples are appended.
+}
+\seealso{
+\code{\link[=format_data]{format_data()}}, \code{\link[=connect_db]{connect_db()}}, \code{\link[=start_pipeline]{start_pipeline()}}
 }

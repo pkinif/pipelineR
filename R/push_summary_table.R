@@ -1,13 +1,16 @@
-#' Push the summary table to PostgreSQL
+#' Write batch logs to `pipeline_logs`
 #'
-#' This function writes the batch summary to the student's `pipeline_logs` table inside their schema.
+#' Appends `summary_table` to `{PG_SCHEMA}.pipeline_logs` with [DBI::dbWriteTable()].
+#' Adds column `user_login` from `user_login` or `Sys.getenv("user_login")`;
+#' that environment variable must be set for the default to work.
 #'
-#' @param con A valid DBI database connection.
-#' @param summary_table The tibble created during the pipeline (via build_summary_table and log_summary).
-#' @param user_login Optional, defaults to Sys.getenv('user_login'). The login of the student (e.g., "paul", "fariba").
+#' @param con DBI connection.
+#' @param summary_table Tibble from [build_summary_table()] and [log_summary()].
+#' @param user_login Student or job id; default reads `Sys.getenv("user_login")`.
 #'
-#' @return Nothing. Pushes logs into the database.
+#' @return `invisible(NULL)`. If `summary_table` has zero rows, only a message is printed.
 #' @export
+#' @seealso [log_summary()], [start_pipeline()]
 push_summary_table <- function(con, summary_table, user_login = Sys.getenv('user_login')) {
 
   if (is.null(con) || is.null(summary_table) || is.null(user_login) || user_login == "") {
