@@ -61,6 +61,22 @@ For ad hoc maintenance (e.g. trimming recent rows before a re-run), see `dev/ext
 
 ## Workflow
 
+The diagram below matches what [`start_pipeline()`](R/start_pipeline.R) does end-to-end. In words:
+
+1. **Connect** — Open PostgreSQL with [`connect_db()`](R/connect_db.R) using your `PG_*` environment variables.
+2. **Symbol universe** — Read distinct tickers from **`sp500.info`** with [`fetch_symbols()`](R/fetch_symbols.R) (`symbol` + `index_ts`).
+3. **Log shell** — Create an empty in-memory log tibble with [`build_summary_table()`](R/build_summary_table.R); it will receive one row per batch (or per batch error).
+4. **Batching** — Split the symbol table into chunks of size `batch_size` with [`split_batch()`](R/split_batch.R) so Yahoo requests stay small and stable.
+5. **Per batch (repeated)** — For each chunk:
+   - **Download** OHLCV from Yahoo Finance via [`yahoo_query_data()`](R/yahoo_query_data.R) (uses `tidyquant::tq_get`, with an optional retry on failure).
+   - **Reshape** the wide table to long form with [`format_data()`](R/format_data.R) (`metric` / `value` rows).
+   - **Load** only new keys into **`{PG_SCHEMA}.data_sp500`** with [`insert_new_data()`](R/insert_new_data.R) (deduplication on `date` + `index_ts` + `metric`).
+   - **Record** the outcome in an in-memory tibble with [`log_summary()`](R/log_summary.R) (`ok` / `error`, row counts, message). Failures in one batch do not stop the rest.
+6. **Persist logs** — After all batches, write the summary tibble to **`{PG_SCHEMA}.pipeline_logs`** with [`push_summary_table()`](R/push_summary_table.R) (adds `user_login` from the environment).
+7. **Disconnect** — Close the DB connection.
+
+So there are **two parallel tracks**: the **data track** (symbols → Yahoo → long table → `data_sp500`) and the **audit track** (empty log → one row per batch → `pipeline_logs`). The diagram shows the same idea; **step 5** is the loop over batches (download → format → insert → `log_summary`).
+
 ```mermaid
 flowchart LR
   A[(PostgreSQL\nsp500.info)] --> B[fetch_symbols]
@@ -71,6 +87,8 @@ flowchart LR
   C --> G[log_summary]
   G --> H[(PG_SCHEMA.pipeline_logs)]
 ```
+
+*(In code, `log_summary` runs inside the batch loop after each download/insert attempt, not only once after `split_batch`; the arrow from `split_batch` to `log_summary` in the diagram is shorthand for “for each batch, append to the log”.)*
 
 ## Main functions
 
@@ -101,6 +119,24 @@ After `library(pipelineR)`, open any help page with `?start_pipeline`, `?connect
 - **Imports**: `DBI`, `RPostgres`, `dplyr`, `glue`, `lubridate`, `tibble`, `tidyr`, `tidyquant`
 - **PostgreSQL** with the schema and tables above
 - Network access for Yahoo Finance when running the pipeline
+
+## Is the package ready to use?
+
+**Yes, for day-to-day use** (course, internal jobs, `remotes::install_github`) **if** you have:
+
+| Prerequisite | Why |
+|--------------|-----|
+| PostgreSQL reachable with `PG_*` + `PG_SCHEMA` set | Core storage |
+| Table **`sp500.info`** with `symbol` and `index_ts` | Defines what to download |
+| Tables **`{PG_SCHEMA}.data_sp500`** and **`{PG_SCHEMA}.pipeline_logs`** with compatible columns | Insert + logging |
+| **`user_login`** in the environment | Required by `push_summary_table()` |
+| Internet access | Yahoo Finance API |
+
+The package **passes `R CMD check`** (vignette builds; tests run — DB-heavy tests **skip** if the database or tables are missing). CI on GitHub exercises the same check when configured with secrets.
+
+**Version `0.0.0.9000`** is a **development** version number: fine for GitHub installs, not a formal “1.0” release label. For a **CRAN** submission you would typically bump to something like `0.1.0`, add a `NEWS.md`, and walk through CRAN policies; this package is **not** aimed at CRAN in its current form unless you decide to publish it there.
+
+**Optional clean-ups** (not blockers for using it): deprecated [`check_existing_data()`](R/check_existing_data.R) is still exported; you can ignore it and use `insert_new_data()` for deduplication.
 
 ## Documentation
 
