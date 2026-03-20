@@ -1,5 +1,5 @@
 test_that("insert_new_data() inserts new rows successfully", {
-  skip_if_no_db()
+  skip_if_db_tables_missing("data_sp500")
   con <- connect_db()
 
   # Create fake dataset matching table structure
