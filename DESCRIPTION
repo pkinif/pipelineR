@@ -20,7 +20,8 @@ Suggests:
     markdown,
     purrr,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    xfun (>= 0.55)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Imports: 

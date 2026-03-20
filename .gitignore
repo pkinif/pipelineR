@@ -6,5 +6,6 @@
 .quarto
 .Renviron
 *.Rproj
+!pipelineR.Rproj
 /renv
 .Rprofile

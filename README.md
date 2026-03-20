@@ -107,3 +107,27 @@ After `library(pipelineR)`, open any help page with `?start_pipeline`, `?connect
 - Help: `library(pipelineR); ?pipelineR-package; ?start_pipeline`
 - Vignette: *Getting started with pipelineR* (`vignette("getting-started")` if installed with vignettes)
 - Source and issues: <https://github.com/pkinif/pipelineR>
+
+## Troubleshooting (RStudio Check / vignettes)
+
+### Error: `xfun` 0.52 loaded but `>= 0.55` required
+
+Recent **knitr** needs a current **xfun**. The build step runs in a **new R process**, but if you still see this:
+
+1. Update and **restart R** (RStudio: *Session → Restart R*), then try Check again:
+   ```r
+   install.packages(c("xfun", "knitr", "rmarkdown"), type = "binary")
+   packageVersion("xfun")   # should be >= 0.55
+   ```
+2. Confirm RStudio uses the same R installation as the console: *Tools → Global Options → R*.
+3. If another library path has an old **xfun**, inspect `find.package("xfun")` and `.libPaths()`.
+
+### Check without rebuilding vignettes
+
+From the R console (reliable if the IDE button keeps failing):
+
+```r
+devtools::check(document = FALSE, vignettes = FALSE)
+```
+
+Opening **`pipelineR.Rproj`** in RStudio configures *Package build/check* with `--no-build-vignettes` so the **Check** button skips vignette compilation (vignette sources remain in the package; they are not knitted during that build).
