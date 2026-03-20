@@ -1,21 +1,15 @@
-#' Split a tibble of symbols into batches
+#' Split symbols into batches
 #'
-#' This function splits a tibble into a list of smaller tibbles, each containing up to `batch_size` rows.
+#' Splits `symbol_list` into a list of tibbles of at most `batch_size` rows
+#' each, preserving row order. Batching reduces Yahoo Finance rate limits,
+#' timeouts, and partial responses when many tickers are requested at once.
 #'
-#' Batching is important because querying too many symbols at once from external APIs (like Yahoo Finance)
-#' can lead to:
-#' - API rate limits being exceeded,
-#' - Timeout errors,
-#' - Partial or corrupted data responses.
+#' @param symbol_list A tibble with at least column `symbol` (typically from [fetch_symbols()]).
+#' @param batch_size Maximum rows per batch. Default `25`.
 #'
-#' By splitting requests into manageable batches, we ensure more stable API calls, reduce failure rates,
-#' and improve overall pipeline reliability.
-#'
-#' @param symbol_list A tibble containing at least a column `symbol`. Typically output from `fetch_symbols()`.
-#' @param batch_size An integer indicating the maximum number of rows per batch. Default is 25.
-#'
-#' @return A list of tibbles, each containing up to `batch_size` symbols.
+#' @return A list of tibbles; empty input yields an empty list (with a warning).
 #' @export
+#' @seealso [yahoo_query_data()], [start_pipeline()]
 split_batch <- function(symbol_list, batch_size = 25) {
 
   if (!tibble::is_tibble(symbol_list)) {

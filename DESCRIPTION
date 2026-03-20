@@ -1,17 +1,28 @@
 Package: pipelineR
-Title: Tools to Automate Financial Data Pipelines with R
+Title: Financial Data ETL from Yahoo Finance to PostgreSQL
 Version: 0.0.0.9000
 Authors@R: person("Pierrick", "KINIF", email = "pierrick.kinif@datagrowth.io", role = 'cre')
-Description: This package provides tools to process stock market data and automate data pipelines. It is designed to work smoothly with PostgreSQL databases.
+Description: Automates an end-to-end pipeline: read ticker symbols from PostgreSQL,
+    download OHLCV history via 'tidyquant' (Yahoo Finance), pivot to long format,
+    append only non-duplicate rows to a student schema, and log batch outcomes.
+    Designed for teaching and internal workflows that use 'RPostgres' and a shared
+    'sp500.info' reference table.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 URL: https://github.com/pkinif/pipelineR
 BugReports: https://github.com/pkinif/pipelineR/issues
+Depends:
+    R (>= 4.1.0)
 Suggests: 
+    knitr,
+    markdown,
     purrr,
-    testthat (>= 3.0.0)
+    rmarkdown,
+    testthat (>= 3.0.0),
+    xfun (>= 0.55)
+VignetteBuilder: knitr
 Config/testthat/edition: 3
 Imports: 
     DBI,

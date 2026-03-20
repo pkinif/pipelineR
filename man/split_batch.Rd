@@ -2,30 +2,23 @@
 % Please edit documentation in R/split_batch.R
 \name{split_batch}
 \alias{split_batch}
-\title{Split a tibble of symbols into batches}
+\title{Split symbols into batches}
 \usage{
 split_batch(symbol_list, batch_size = 25)
 }
 \arguments{
-\item{symbol_list}{A tibble containing at least a column \code{symbol}. Typically output from \code{fetch_symbols()}.}
+\item{symbol_list}{A tibble with at least column \code{symbol} (typically from \code{\link[=fetch_symbols]{fetch_symbols()}}).}
 
-\item{batch_size}{An integer indicating the maximum number of rows per batch. Default is 25.}
+\item{batch_size}{Maximum rows per batch. Default \code{25}.}
 }
 \value{
-A list of tibbles, each containing up to \code{batch_size} symbols.
+A list of tibbles; empty input yields an empty list (with a warning).
 }
 \description{
-This function splits a tibble into a list of smaller tibbles, each containing up to \code{batch_size} rows.
+Splits \code{symbol_list} into a list of tibbles of at most \code{batch_size} rows
+each, preserving row order. Batching reduces Yahoo Finance rate limits,
+timeouts, and partial responses when many tickers are requested at once.
 }
-\details{
-Batching is important because querying too many symbols at once from external APIs (like Yahoo Finance)
-can lead to:
-\itemize{
-\item API rate limits being exceeded,
-\item Timeout errors,
-\item Partial or corrupted data responses.
-}
-
-By splitting requests into manageable batches, we ensure more stable API calls, reduce failure rates,
-and improve overall pipeline reliability.
+\seealso{
+\code{\link[=yahoo_query_data]{yahoo_query_data()}}, \code{\link[=start_pipeline]{start_pipeline()}}
 }

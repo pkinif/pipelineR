@@ -1,16 +1,19 @@
-#' Log the result of processing a batch
+#' Append one batch row to the in-memory log
 #'
-#' This function adds a new row to the summary table with details about the batch processing.
+#' Binds a new row to `summary_table` with a fresh `timestamp`. Used by
+#' [start_pipeline()] after each batch (success or error). Does not write to
+#' the database until [push_summary_table()].
 #'
-#' @param summary_table The current summary table (a tibble).
-#' @param batch_id The batch number.
-#' @param symbol The symbol being processed.
-#' @param status Processing status ("ok" or "error").
-#' @param n_rows Number of rows fetched or inserted.
-#' @param message Optional message (error, info, etc.).
+#' @param summary_table Current log tibble from [build_summary_table()] / prior calls.
+#' @param batch_id Batch index (integer).
+#' @param symbol Ticker string or comma-separated list for the batch.
+#' @param status `"ok"` or `"error"` (convention used by the pipeline).
+#' @param n_rows Number of rows inserted in that batch, or `0` on error / no new rows.
+#' @param message Human-readable detail or error text.
 #'
-#' @return An updated summary table (tibble).
+#' @return Updated tibble (new row at the bottom).
 #' @export
+#' @seealso [build_summary_table()], [push_summary_table()]
 log_summary <- function(summary_table, batch_id, symbol, status, n_rows = 0, message = "") {
 
   new_row <- tibble::tibble(

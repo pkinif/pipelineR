@@ -1,0 +1,83 @@
+---
+title: "Getting started with pipelineR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with pipelineR}
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Overview
+
+**pipelineR** connects three pieces:
+
+1. **PostgreSQL** — symbols (`sp500.info`) and your schema (`data_sp500`, `pipeline_logs`).
+2. **Yahoo Finance** (via `tidyquant::tq_get`) — daily OHLCV for those symbols.
+3. **R** — batching, reshaping to long format, deduplicated inserts, and logging.
+
+The usual entry point is `start_pipeline()`, which runs the full workflow and disconnects when finished.
+
+## Configuration
+
+Create or edit `~/.Renviron` (or project-level `.Renviron`) with:
+
+| Variable | Role |
+|----------|------|
+| `PG_DB` | Database name |
+| `PG_HOST` | Host |
+| `PG_USER` | User |
+| `PG_PASSWORD` | Password |
+| `PG_SCHEMA` | Schema containing `data_sp500` and `pipeline_logs` |
+| `user_login` | Your id (stored in `pipeline_logs`) |
+
+`connect_db()` checks that `PG_DB`, `PG_HOST`, `PG_USER`, `PG_PASSWORD`, and `PG_SCHEMA` are non-empty before opening a connection.
+
+## Run the pipeline
+
+```{r eval = FALSE}
+library(pipelineR)
+
+start_pipeline(
+  from = Sys.Date() - 10,
+  to = Sys.Date(),
+  batch_size = 25
+)
+```
+
+Arguments:
+
+- **`from`**, **`to`** — date range passed to Yahoo Finance (defaults: last 7 days through today).
+- **`batch_size`** — number of symbols per API call (default `25`); smaller batches can reduce rate-limit issues.
+
+## Pipeline steps (reference)
+
+If you build a custom workflow, the logical order is:
+
+1. `connect_db()` — DB connection  
+2. `fetch_symbols(con)` — tickers from `sp500.info`  
+3. `split_batch(symbols, batch_size)` — list of batches  
+4. For each batch: `yahoo_query_data(batch, from, to)` then `format_data()` then `insert_new_data(con, ...)`  
+5. `build_summary_table()` / `log_summary()` — in-memory log rows  
+6. `push_summary_table(con, summary_table)` — append to `pipeline_logs`  
+7. `DBI::dbDisconnect(con)`
+
+`start_pipeline()` wires these together and handles per-batch errors so one failure does not stop the whole run.
+
+## Data shapes
+
+- **`yahoo_query_data()`** returns a *wide* tibble (one row per symbol × date, with `open`, `high`, …, `close_adjusted`, `index_ts`, `source`).
+- **`format_data()`** pivots to *long* form with columns `index_ts`, `date`, `metric`, `value` (metrics: `open`, `high`, `low`, `close`, `volume`, `close_adjusted`).
+- **`insert_new_data()`** skips rows whose `(date, index_ts, metric)` triple already exists in `data_sp500`.
+
+## Further reading
+
+- Function help: `?start_pipeline`, `?connect_db`  
+- [README](https://github.com/pkinif/pipelineR) on GitHub  
+- Issues: <https://github.com/pkinif/pipelineR/issues>

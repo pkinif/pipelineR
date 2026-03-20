@@ -2,26 +2,31 @@
 % Please edit documentation in R/log_summary.R
 \name{log_summary}
 \alias{log_summary}
-\title{Log the result of processing a batch}
+\title{Append one batch row to the in-memory log}
 \usage{
 log_summary(summary_table, batch_id, symbol, status, n_rows = 0, message = "")
 }
 \arguments{
-\item{summary_table}{The current summary table (a tibble).}
+\item{summary_table}{Current log tibble from \code{\link[=build_summary_table]{build_summary_table()}} / prior calls.}
 
-\item{batch_id}{The batch number.}
+\item{batch_id}{Batch index (integer).}
 
-\item{symbol}{The symbol being processed.}
+\item{symbol}{Ticker string or comma-separated list for the batch.}
 
-\item{status}{Processing status ("ok" or "error").}
+\item{status}{\code{"ok"} or \code{"error"} (convention used by the pipeline).}
 
-\item{n_rows}{Number of rows fetched or inserted.}
+\item{n_rows}{Number of rows inserted in that batch, or \code{0} on error / no new rows.}
 
-\item{message}{Optional message (error, info, etc.).}
+\item{message}{Human-readable detail or error text.}
 }
 \value{
-An updated summary table (tibble).
+Updated tibble (new row at the bottom).
 }
 \description{
-This function adds a new row to the summary table with details about the batch processing.
+Binds a new row to \code{summary_table} with a fresh \code{timestamp}. Used by
+\code{\link[=start_pipeline]{start_pipeline()}} after each batch (success or error). Does not write to
+the database until \code{\link[=push_summary_table]{push_summary_table()}}.
+}
+\seealso{
+\code{\link[=build_summary_table]{build_summary_table()}}, \code{\link[=push_summary_table]{push_summary_table()}}
 }

@@ -18,7 +18,7 @@ get_max_date <- function(con, schema = Sys.getenv("PG_SCHEMA")) {
 
 remove_last_days <- function(con, days = 6, schema = Sys.getenv("PG_SCHEMA")) {
   query <- glue::glue_sql(
-      "DELETE FROM {`schema`}.data_sp500 WHERE date > {Sys.Date() - {days}}",
+      "DELETE FROM {`schema`}.data_sp500 WHERE date > {Sys.Date() - days}",
     .con = con
   )
   DBI::dbExecute(con, query)

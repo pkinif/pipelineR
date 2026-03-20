@@ -2,21 +2,33 @@
 % Please edit documentation in R/start_pipeline.R
 \name{start_pipeline}
 \alias{start_pipeline}
-\title{Start the full data pipeline: fetch, insert and log}
+\title{Run the full ETL pipeline}
 \usage{
 start_pipeline(from = Sys.Date() - 7, to = Sys.Date(), batch_size = 25)
 }
 \arguments{
-\item{from}{A Date object specifying the start date. Default is 7 days ago.}
+\item{from}{Start date (inclusive) for Yahoo Finance history. Default: seven days ago.}
 
-\item{to}{A Date object specifying the end date. Default is today.}
+\item{to}{End date (inclusive). Default: today.}
 
-\item{batch_size}{Number of tickers to process in each batch. Default is 25.}
+\item{batch_size}{Maximum number of symbols per batch (passed to \code{\link[=split_batch]{split_batch()}}).}
 }
 \value{
-Nothing. Inserts new data into PostgreSQL and logs batch processing in \code{pipeline_logs}.
+Invisibly \code{NULL}. Called for side effects (database writes and messages).
 }
 \description{
-This function fetches data from Yahoo Finance for a range of dates and inserts the results
-into the student's PostgreSQL database. It processes symbols in batches and logs the process.
+Connects to PostgreSQL, loads symbols from \code{sp500.info}, splits them into
+batches, downloads OHLCV from Yahoo Finance for each batch between \code{from} and
+\code{to}, reshapes with \code{\link[=format_data]{format_data()}}, inserts only new rows with
+\code{\link[=insert_new_data]{insert_new_data()}}, and records outcomes in memory then flushes them with
+\code{\link[=push_summary_table]{push_summary_table()}} to \verb{\{PG_SCHEMA\}.pipeline_logs}. The connection is
+closed on success.
+}
+\details{
+If a batch fails (API error, no rows, etc.), the error is caught, a row is
+appended to the summary with \code{status = "error"}, and processing continues
+with the next batch.
+}
+\seealso{
+\code{\link[=connect_db]{connect_db()}}, \code{\link[=fetch_symbols]{fetch_symbols()}}, \code{\link[=yahoo_query_data]{yahoo_query_data()}}, \code{\link[=insert_new_data]{insert_new_data()}}
 }

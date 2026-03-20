@@ -1,21 +1,23 @@
-
-#' Format wide Yahoo Finance data into long format
+#' Pivot wide OHLCV to long format
 #'
-#' This function reshapes a wide tibble of stock prices into a long format
-#' compatible with the `data_sp500` database table.
+#' Takes the wide output of [yahoo_query_data()] and pivots `open`, `high`,
+#' `low`, `close`, `volume`, and `close_adjusted` into two columns: `metric` and
+#' `value`, keeping `index_ts` and `date`. The result matches the long layout
+#' expected by [insert_new_data()].
 #'
-#' @param data A tibble with columns like open, high, low, close, volume, close_adjusted, etc.
+#' @param ohlcv Wide tibble (e.g. from [yahoo_query_data()]) with the columns above plus `index_ts`, `date`.
 #'
-#' @return A tibble in long format with columns: index_ts, date, metric, value.
+#' @return A [tibble::tibble()] with columns `index_ts`, `date`, `metric`, `value`.
 #' @export
-format_data <- function(data) {
+#' @seealso [insert_new_data()], [yahoo_query_data()]
+format_data <- function(ohlcv) {
 
-  if (is.null(data)) {
-    stop("'new_data' must be provided.")
+  if (is.null(ohlcv)) {
+    stop("'ohlcv' must be provided.")
   }
 
   # Pivot longer
-  long_data <- data |>
+  long_data <- ohlcv |>
     tidyr::pivot_longer(
       cols = c(open, high, low, close, volume, close_adjusted),
       names_to = "metric",

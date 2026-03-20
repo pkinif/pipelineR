@@ -2,31 +2,37 @@
 % Please edit documentation in R/connect_db.R
 \name{connect_db}
 \alias{connect_db}
-\title{Connect to the ADEM PostgreSQL Database}
+\title{Connect to PostgreSQL}
 \usage{
 connect_db()
 }
 \value{
-A DBI connection object (class \code{"PqConnection"})
+A DBI connection object (S4 class \code{"PqConnection"}).
 }
 \description{
-Establishes a connection to the PostgreSQL database using credentials
-and host information stored in environment variables. This function is used
-internally by other functions that need to interact with the ADEM database.
+Opens a connection with \code{\link[RPostgres:Postgres]{RPostgres::Postgres()}} using credentials from the
+environment. All of \code{PG_DB}, \code{PG_HOST}, \code{PG_USER}, \code{PG_PASSWORD}, and
+\code{PG_SCHEMA} must be set and non-empty; otherwise an error is raised before
+connecting. Port is fixed at \code{5432}.
 }
-\details{
-Environment variables expected:
-\itemize{
-\item PG_DB: database name
-\item PG_HOST: database host
-\item PG_USER: database username
-\item PG_PASSWORD: database password
+\section{Environment variables}{
+
+\describe{
+\item{PG_DB}{Database name.}
+\item{PG_HOST}{Host name or IP.}
+\item{PG_USER}{User name.}
+\item{PG_PASSWORD}{Password.}
+\item{PG_SCHEMA}{Schema used by \code{\link[=insert_new_data]{insert_new_data()}} and \code{\link[=push_summary_table]{push_summary_table()}}.}
 }
 }
+
 \examples{
 \dontrun{
 con <- connect_db()
 DBI::dbListTables(con)
 DBI::dbDisconnect(con)
 }
+}
+\seealso{
+\code{\link[=start_pipeline]{start_pipeline()}}, \code{\link[=fetch_symbols]{fetch_symbols()}}, \code{\link[DBI:dbDisconnect]{DBI::dbDisconnect()}}
 }

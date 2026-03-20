@@ -2,20 +2,25 @@
 % Please edit documentation in R/push_summary_table.R
 \name{push_summary_table}
 \alias{push_summary_table}
-\title{Push the summary table to PostgreSQL}
+\title{Write batch logs to \code{pipeline_logs}}
 \usage{
 push_summary_table(con, summary_table, user_login = Sys.getenv("user_login"))
 }
 \arguments{
-\item{con}{A valid DBI database connection.}
+\item{con}{DBI connection.}
 
-\item{summary_table}{The tibble created during the pipeline (via build_summary_table and log_summary).}
+\item{summary_table}{Tibble from \code{\link[=build_summary_table]{build_summary_table()}} and \code{\link[=log_summary]{log_summary()}}.}
 
-\item{user_login}{Optional, defaults to Sys.getenv('user_login'). The login of the student (e.g., "paul", "fariba").}
+\item{user_login}{Student or job id; default reads \code{Sys.getenv("user_login")}.}
 }
 \value{
-Nothing. Pushes logs into the database.
+\code{invisible(NULL)}. If \code{summary_table} has zero rows, only a message is printed.
 }
 \description{
-This function writes the batch summary to the student's \code{pipeline_logs} table inside their schema.
+Appends \code{summary_table} to \verb{\{PG_SCHEMA\}.pipeline_logs} with \code{\link[DBI:dbWriteTable]{DBI::dbWriteTable()}}.
+Adds column \code{user_login} from \code{user_login} or \code{Sys.getenv("user_login")};
+that environment variable must be set for the default to work.
+}
+\seealso{
+\code{\link[=log_summary]{log_summary()}}, \code{\link[=start_pipeline]{start_pipeline()}}
 }

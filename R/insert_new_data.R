@@ -1,13 +1,16 @@
-#' Insert new stock data into the database
+#' Insert long-format prices into `data_sp500`
 #'
-#' This function inserts new stock data into the student's data_sp500 table inside their schema.
-#' It automatically removes duplicates (already existing date/index_ts/metric) before inserting.
+#' Writes to `{PG_SCHEMA}.data_sp500` via [DBI::dbWriteTable()] with `append =
+#' TRUE`. First loads existing `(date, index_ts, metric)` keys for the dates and
+#' index codes present in `new_data`, then [dplyr::anti_join()]s so only new
+#' triples are appended.
 #'
-#' @param con A valid DBI database connection.
-#' @param new_data A tibble matching the table structure.
+#' @param con DBI connection.
+#' @param new_data Tibble with columns `index_ts`, `date`, `metric`, `value` (as from [format_data()]).
 #'
-#' @return The number of rows actually inserted.
+#' @return Integer number of rows inserted (`0` if everything was already present).
 #' @export
+#' @seealso [format_data()], [connect_db()], [start_pipeline()]
 insert_new_data <- function(con, new_data) {
 
   if (is.null(con) || is.null(new_data)) {

@@ -1,14 +1,23 @@
-#' Start the full data pipeline: fetch, insert and log
+#' Run the full ETL pipeline
 #'
-#' This function fetches data from Yahoo Finance for a range of dates and inserts the results
-#' into the student's PostgreSQL database. It processes symbols in batches and logs the process.
+#' Connects to PostgreSQL, loads symbols from `sp500.info`, splits them into
+#' batches, downloads OHLCV from Yahoo Finance for each batch between `from` and
+#' `to`, reshapes with [format_data()], inserts only new rows with
+#' [insert_new_data()], and records outcomes in memory then flushes them with
+#' [push_summary_table()] to `{PG_SCHEMA}.pipeline_logs`. The connection is
+#' closed on success.
 #'
-#' @param from A Date object specifying the start date. Default is 7 days ago.
-#' @param to A Date object specifying the end date. Default is today.
-#' @param batch_size Number of tickers to process in each batch. Default is 25.
+#' If a batch fails (API error, no rows, etc.), the error is caught, a row is
+#' appended to the summary with `status = "error"`, and processing continues
+#' with the next batch.
 #'
-#' @return Nothing. Inserts new data into PostgreSQL and logs batch processing in `pipeline_logs`.
+#' @param from Start date (inclusive) for Yahoo Finance history. Default: seven days ago.
+#' @param to End date (inclusive). Default: today.
+#' @param batch_size Maximum number of symbols per batch (passed to [split_batch()]).
+#'
+#' @return Invisibly `NULL`. Called for side effects (database writes and messages).
 #' @export
+#' @seealso [connect_db()], [fetch_symbols()], [yahoo_query_data()], [insert_new_data()]
 start_pipeline <- function(from = Sys.Date() - 7, to = Sys.Date(), batch_size = 25) {
 
   # 1. Connect to PostgreSQL
@@ -49,7 +58,6 @@ start_pipeline <- function(from = Sys.Date() - 7, to = Sys.Date(), batch_size = 
         stop("No data returned from Yahoo Finance API.")
       }
       # 5.2 Insert into PostgreSQL
-      # browser()
       n_inserted  <- new_data |>
         format_data() |>
         insert_new_data(con = con)

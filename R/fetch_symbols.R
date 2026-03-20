@@ -1,13 +1,15 @@
-#' Fetch S&P 500 symbols from the database
+#' Fetch symbols from `sp500.info`
 #'
-#' This function retrieves a list of distinct symbols and their corresponding index_ts
-#' from the `sp500.info` table in the PostgreSQL database.
+#' Reads distinct pairs of Yahoo ticker (`symbol`) and index identifier
+#' (`index_ts`) from the `sp500.info` table. This table must exist on the same
+#' database you connected to with [connect_db()].
 #'
-#' @param con A valid DBI database connection.
+#' @param con A DBI connection (e.g. from [connect_db()]).
 #'
-#' @return A tibble containing two columns: `symbol` and `index_ts`.
-#' If no symbols are found, a warning is issued and an empty tibble is returned.
+#' @return A [tibble::tibble()] with columns `symbol` and `index_ts`. If no rows
+#'   are returned, gives a warning and returns an empty tibble.
 #' @export
+#' @seealso [split_batch()], [start_pipeline()]
 fetch_symbols <- function(con) {
 
   if (is.null(con)) {
